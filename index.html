@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Blogbot</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!-- !! do not change code in this area -->
+
+<head>
+  <meta charset="UTF-8">
+  <title>Blogbot</title>
+  <link rel="stylesheet" href="./style.css">
+  <script  src="./script.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100&display=swap" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+  <div id="col-1" class="col">
+    <h1>Blogbot</h1>
+    <button onclick="runBlogbot()">Run Blogbot</button>
+    <button onclick="copyCode()">Copy Code</button>
+    <button onclick="clearCode()">Clear Code</button><br><br>
+    <textarea id="source-code-area" placeholder="Paste your source code here, then click Run Blogbot."></textarea><br>
+  </div>
+  <div id="col-2" class="col">
+    <form>
+      <p>Modify source code:</p>
+      <input type="checkbox" id="checkbox-1" name="checkbox-1" checked>
+      <label for="checkbox-1">Add a "read more" tag after the first paragraph </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot adds the "more" tag after the first paragraph in the body text. If no paragraph is found, a "more" tag will not be placed.</span></span><br>
+      <input type="checkbox" id="checkbox-2" name="checkbox-2" checked>
+      <label for="checkbox-2">Clear span tags </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot clears all span tags from the document. Note that if you are using codepen, the embed code requires span tags.</span></span><br>
+      <input type="checkbox" id="checkbox-3" name="checkbox-3" checked>
+      <label for="checkbox-3">Clear style attributes </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot clears all style attributes from all tags (except for table tags) in the document.</span></span><br>
+      <input type="checkbox" id="checkbox-4" name="checkbox-4" checked>
+      <label for="checkbox-4">Clear empty lines </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot deletes empty lines to reduce extra space between paragraphs.</span></span><br>
+      <input type="checkbox" id="checkbox-5" name="checkbox-5" checked>
+      <label for="checkbox-5">Replace nbsp characters with regular spaces </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot replaces all instances of the special character nbsp (non-breaking space) with a normal space.</span></span><br>
+      <input type="checkbox" id="checkbox-6" name="checkbox-6" checked>
+      <label for="checkbox-6">Set links to open in a new tab </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot makes all links in the body text (besides anchor links) to open in a new tab, and also adds the rel="noopener" attribute to these links.</span></span><br>
+      <input type="checkbox" id="checkbox-7" name="checkbox-7" checked>
+      <label for="checkbox-7">Convert straight quotes to smart quotes </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot converts straight quotes to smart (aka curly) quotes.</span></span><br>
+      <input type="checkbox" id="checkbox-8" name="checkbox-8" checked>
+      <label for="checkbox-8">Format images </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot applies formatting to all images in the post body: centered, 650px wide.</span></span><br>
+      <input type="checkbox" id="checkbox-9" name="checkbox-9" checked>
+      <label for="checkbox-9">Format "Image Source" links </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot applies formatting to all "Image Source" links: centered, 12px, italicized, both words capitalized.</span></span><br>
+      <input type="checkbox" id="checkbox-10" name="checkbox-10" checked>
+      <label for="checkbox-10">Add alt text underneath an image as image's alt text </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">If there is alt text written under an image (that begins with "alt:" or "alt text", case insensitive), Blogbot removes this text from the post body and makes it the alt text of the preceeding image.</span></span><br>
+      <input type="checkbox" id="checkbox-11" name="checkbox-11" checked>
+      <label for="checkbox-11">Remove "IMG name:" or "Image name:" under images </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">If there is an image name written underneath an image (starting with "IMG name:" or "Image name:", case-insensitive), Blogbot removes this line of text from the post body.</span></span><br>
+      <input type="checkbox" id="checkbox-18" name="checkbox-18">
+      <label for="checkbox-18">Add anchors above H2s </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot adds anchors above all H2s and featured snippets. These anchors can be linked to in a table of contents. This option is turned off by default.</span></span><br>
+      <p>Check for formatting/style issues:</p>
+      <input type="checkbox" id="checkbox-12" name="checkbox-12" checked>
+      <label for="checkbox-12">Check that headings are in the proper order </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot checks for skipped headings (e.g., an h4 following an h2).</span></span><br>
+      <input type="checkbox" id="checkbox-13" name="checkbox-13" checked>
+      <label for="checkbox-13">Check for double-hyphens </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot checks for instances of double-hyphens (--), which should be replaced with em dashes.</span></span><br>
+      <input type="checkbox" id="checkbox-14" name="checkbox-14" checked>
+      <label for="checkbox-14">Check that ellipses have spaces on both sides </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot checks that ellipses have spaces between surrounding text.</span></span><br>
+      <input type="checkbox" id="checkbox-15" name="checkbox-15" checked>
+      <label for="checkbox-15">Check that "vs." and "versus" are used correctly </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot checks that "vs." is used only in headings and "versus" is used only in paragraphs.</span></span><br>
+      <input type="checkbox" id="checkbox-16" name="checkbox-16" checked>
+      <label for="checkbox-16">Check for tracking parameters in URLs </label>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Blogbot checks for tracking parameters in all URLs (with the exception of YouTube URLs) by scanning for the "?" character. If a "?" is found in a URL, Blogbot flags it. Everything including and after the "?" in the URL should be removed as long as the link still works properly without it.</span></span><br>
+      <p>Featured snippets:</p>
+      <input type="checkbox" id="checkbox-17" name="checkbox-17" checked>
+      <label for="checkbox-17">Create featured snippets. </label><a href="https://wiki.hubspotcentral.net/pages/viewpage.action?pageId=632657137" target="_blank">See full instructions here.</a>
+      <span class="tooltip">ⓘ<span class="tooltiptext">Creates paragraph/list snippets from body copy. To create a featured snippet, place your featured snippet content between <strong>[FS]</strong> and <strong>[/fs]</strong> tags.</span></span><br>
+
+    </form>
+    <p>Issues:</p>
+    <textarea id="warning-area" readonly disabled></textarea>
+  </div>
+</body>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
