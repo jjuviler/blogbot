@@ -1,3 +1,5 @@
+// !! do not change code in this area
+
 function runBlogbot() {
   var fadeTime = 300;
 
@@ -13,8 +15,6 @@ function runBlogbot() {
     if ($("#checkbox-6").is(":checked")) { bodyText = openLinksInNewTab(bodyText); }
     if ($("#checkbox-7").is(":checked")) { bodyText = convertToSmartQuotes(bodyText); }
     if ($("#checkbox-8").is(":checked")) { bodyText = formatImages(bodyText); }
-                    console.log(bodyText);
-
     if ($("#checkbox-9").is(":checked")) { bodyText = formatImageSource(bodyText); }
     if ($("#checkbox-10").is(":checked")) { bodyText = addAltText(bodyText); }
     if ($("#checkbox-11").is(":checked")) { bodyText = removeImgName(bodyText); }
@@ -214,47 +214,40 @@ function convertToSmartQuotes(htmlString) {
 
 // looks for alt text written below images and adds it to the preceeding image's alt text attribute
 function addAltText(htmlCode) {
-  const regex = /.*(?:alt|alt text):\s*(.*)/gi; // Matches lines with "alt" or "alt text" and captures the text after it
-  const lines = htmlCode.split('\n'); // Splits the HTML code into lines
-  const tagRegex = /<[^>]*>/g; // Matches HTML tags
+  const regex = /.*(?:alt|alt text):\s*(.*)/gi;
+  const lines = htmlCode.split('\n');
+  const tagRegex = /<[^>]*>/g;
 
   for (let i = 0; i < lines.length; i++) {
-    const match = regex.exec(lines[i]); // Checks if the line matches the alt text pattern
+    const match = regex.exec(lines[i]);
     if (match) {
-      const lineWithoutAlt = match[1]; // Extracts the alt text
-      const lineWithoutTags = lineWithoutAlt.replace(tagRegex, ''); // Removes HTML tags from the alt text
-
+      const lineWithoutAlt = match[1];
+      const lineWithoutTags = lineWithoutAlt.replace(tagRegex, '');
+      
       // Find the closest previous image tag
       let j = i - 1;
-      while (j >= 0 && !lines[j].includes('<img')) { // Searches for the previous line with an <img> tag
+      while (j >= 0 && !lines[j].includes('<img')) {
         j--;
       }
 
       if (j >= 0) {
-        const imgMatch = lines[j].match(/<img[^>]*>/); // Matches the <img> tag
+        const imgMatch = lines[j].match(/<img[^>]*>/);
         if (imgMatch) {
-          let imgTag = imgMatch[0];
-          if (imgTag.includes('alt="')) {
-            // Updates the existing alt attribute
-            imgTag = imgTag.replace(/alt="([^"]*)"/, `alt="${lineWithoutTags}"`);
-          } else {
-            // Adds a new alt attribute at the end of the <img> tag
-            imgTag = imgTag.replace(/<img([^>]*)>/, `<img$1 alt="${lineWithoutTags}">`);
-          }
-          const newLine = lines[j].replace(imgMatch[0], imgTag);
+          const imgWithNewAlt = imgMatch[0].replace(/alt="([^"]*)"/, `alt="${lineWithoutTags}"`);
+          const newLine = lines[j].replace(imgMatch[0], imgWithNewAlt);
 
-          // Updates the line with the modified <img> tag
+          // Replace the line with the updated image tag
           lines[j] = newLine;
         }
       }
 
-      // Deletes the line containing the alt text instruction
+      // Delete the line that contains the matched text
       lines.splice(i, 1);
       i--;
     }
   }
 
-  return lines.join('\n'); // Joins the lines back into a single string and returns it
+  return lines.join('\n');
 }
 
 // checks for double dash (--) characters
