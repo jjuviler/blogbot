@@ -223,7 +223,7 @@ function addAltText(htmlCode) {
     if (match) {
       const lineWithoutAlt = match[1];
       const lineWithoutTags = lineWithoutAlt.replace(tagRegex, '');
-      
+
       // Find the closest previous image tag
       let j = i - 1;
       while (j >= 0 && !lines[j].includes('<img')) {
@@ -233,7 +233,10 @@ function addAltText(htmlCode) {
       if (j >= 0) {
         const imgMatch = lines[j].match(/<img[^>]*>/);
         if (imgMatch) {
-          const imgWithNewAlt = imgMatch[0].replace(/alt="([^"]*)"/, `alt="${lineWithoutTags}"`);
+          // Remove the alt attribute if it exists
+          const imgWithoutAlt = imgMatch[0].replace(/alt="[^"]*"/, '');
+          // Insert the new alt attribute
+          const imgWithNewAlt = imgWithoutAlt.replace('<img', `<img alt="${lineWithoutTags}"`);
           const newLine = lines[j].replace(imgMatch[0], imgWithNewAlt);
 
           // Replace the line with the updated image tag
@@ -313,8 +316,6 @@ function createFeaturedSnippets(htmlString) {
 
   // return if no instances of [fs] are found
   if (fsMatches.length === 0) { return htmlString; }
-
-  console.log(fsMatches);
 
   // for each instance of [fs] in htmlString
   for (const fsMatch of fsMatches) {
