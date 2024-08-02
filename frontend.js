@@ -115,9 +115,8 @@ Complete the post settings
 
 Add CTAs
     - Add the Anchor CTA
-    - Add the Bottom CTA
     - Add the Sticky CTA
-    - Add FWCTAs
+    - Add FWCTAs, including one FWCTA at the bottom of the post
 
 Add media
     - Add videos
