@@ -1,5 +1,4 @@
 // snippets.js
-// test
 
 // add featured snippet code to the body of the post
 function createFeaturedSnippets(htmlString) {
