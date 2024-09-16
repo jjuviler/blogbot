@@ -232,3 +232,24 @@ label {
     float: left;
 }
 
+.hidden {
+    display: none;
+}
+
+.copy-container {
+    position: relative; /* Make this container the reference for the popup */
+    display: inline-block; /* Ensure the popup stays in-line with the button */
+}
+
+#copyPopup {
+    font-family: 'Lexend Deca', sans-serif; /* Matches the page font */
+    color: #213443; /* Matches the page text color */
+    position: absolute;
+    top: 50%; /* Align vertically */
+    left: 100%; /* Place it directly to the right of the button */
+    transform: translateY(-50%); /* Vertically centers the popup */
+    margin-left: 10px; /* Adds a little space between the button and popup */
+    opacity: 1;
+    white-space: nowrap; /* Ensures the text stays on one line */
+    transition: opacity 0.5s ease; /* Fades out in 0.5s */
+}
