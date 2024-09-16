@@ -93,7 +93,10 @@
                         <p>Drag and drop your ZIP file here or <label for="fileElem" id="file-upload-label">browse</label> for a file.</p>
                         <input type="file" id="fileElem" style="display:none;" accept=".zip">
                     </div>
-                    <button id="copyHtmlButton" onclick="copyHTML()">Copy HTML</button><br>
+                    <div class="copy-container">
+                        <button id="copyHtmlButton" onclick="copyHTML()">Copy HTML</button>
+                        <div id="copyPopup" class="hidden">HTML copied!</div>
+                    </div>
                     <textarea id="fileContents" style="width:500px; height:200px;"></textarea>
                 </form>
             </div>
