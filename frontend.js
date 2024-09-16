@@ -84,8 +84,27 @@ function copyChecklist() {
 
 function copyHTML() {
     const copyText = $("#fileContents");
+
+    // Check if there is any text in the textarea
+    if (copyText.val().trim() === "") {
+        return; // If the textarea is empty, do nothing
+    }
+
     copyText.select();
     navigator.clipboard.writeText(copyText.val());
+
+    // Display the popup message
+    const popup = document.getElementById("copyPopup");
+    popup.style.display = "inline-block";
+    popup.style.opacity = "1"; // Ensure it's fully visible
+
+    // Hide the popup after 2 seconds, then fade out over 0.5 seconds
+    setTimeout(() => {
+        popup.style.opacity = "0"; // Start fading out
+        setTimeout(() => {
+            popup.style.display = "none"; // Fully hide after fade out
+        }, 500); // Match the duration of the fade-out
+    }, 2000); // Show for 2 seconds before fading out
 }
 
 function addChecklistContent() {
