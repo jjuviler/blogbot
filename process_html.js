@@ -47,6 +47,8 @@ function cleanHTML(htmlString, imgDetails) {
     if ($("#checkbox-5").is(":checked")) { htmlString = formatImageSource(htmlString); }
     htmlString = convertHeadingLists(htmlString);
     htmlString = removeEmptyTags(htmlString);
+    htmlString = removeTrailingWhitespace(htmlString);
+    htmlString = removeEmptyDivs(htmlString);
 
     if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }
     if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }
@@ -721,7 +723,44 @@ function formatImageSource(htmlString) {
     return doc.body.innerHTML;
 }
 
+// remove any unnecessary whitespace characters at the end of paragraph or heading content
+function removeTrailingWhitespace(htmlString) {
+    // Regular expression to match <p> and <h1> to <h6> elements, ignoring content within tags
+    htmlString = htmlString.replace(/(<p[^>]*>|<h[1-6][^>]*>)([\s\S]*?)(<\/p>|<\/h[1-6]>)/g, function(match, openingTag, content, closingTag) {
+        // Match all HTML tags inside the content and store their positions
+        const tagMatches = [...content.matchAll(/<[^>]*>/g)];
+        
+        // Remove all HTML tags from the content to analyze the text
+        const strippedContent = content.replace(/<[^>]*>/g, '');
+        
+        // Find the index of the last non-whitespace character in the stripped content
+        const lastNonWhitespaceIndex = strippedContent.search(/\S(?=\s*$)/);
 
+        if (lastNonWhitespaceIndex !== -1) {
+            // Trim any extra whitespace from the content after the last non-whitespace character
+            const cleanContent = strippedContent.slice(0, lastNonWhitespaceIndex + 1);
+
+            // Reinsert the HTML tags in their original positions
+            let finalContent = cleanContent;
+            tagMatches.forEach(match => {
+                const position = match.index;
+                finalContent = finalContent.slice(0, position) + match[0] + finalContent.slice(position);
+            });
+
+            // Return the cleaned content with the opening and closing tags intact
+            return openingTag + finalContent + closingTag;
+        }
+
+        return match; // If no non-whitespace characters are found, return the match as-is
+    });
+
+    return htmlString;
+}
+
+function removeEmptyDivs(htmlString) {
+    // Regular expression to find and remove exact empty <div></div> occurrences
+    return htmlString.replace(/<div>\s*<\/div>/g, '');
+}
 
 
 // ==================================
@@ -881,24 +920,3 @@ function checkLinkWhitespace(htmlString) {
 
     return matchFound;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
