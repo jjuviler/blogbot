@@ -847,10 +847,17 @@ function checkVersusVs(htmlString) {
 	return regex.test(htmlString);
 }
 
-// check for instances of "?" in URLs
+// check for instances of "?" in URLs (excluding youtube video links, which require a query string)
 function checkQueryStrings(htmlString) {
-	const regex = /<a[^>]*href="([^"]*\?[^"]*)"[^>]*>/g;
-	return regex.test(htmlString);
+    const regex = /<a[^>]*href="([^"]*\?[^"]*)"[^>]*>/g;
+    let match;
+    while ((match = regex.exec(htmlString)) !== null) {
+        const url = match[1];
+        if (!url.includes("youtube.com")) {
+            return true; // Found a non-YouTube link with a query string
+        }
+    }
+    return false; // No non-YouTube links with query strings found
 }
 
 // check for instances of <h1>
@@ -920,3 +927,4 @@ function checkLinkWhitespace(htmlString) {
 
     return matchFound;
 }
+
