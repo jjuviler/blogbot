@@ -49,6 +49,7 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = removeEmptyTags(htmlString);
     htmlString = removeTrailingWhitespace(htmlString);
     htmlString = removeEmptyDivs(htmlString);
+    htmlString = removeDuplicateAnchors(htmlString);
 
     if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }
     if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }
@@ -760,6 +761,17 @@ function removeTrailingWhitespace(htmlString) {
 function removeEmptyDivs(htmlString) {
     // Regular expression to find and remove exact empty <div></div> occurrences
     return htmlString.replace(/<div>\s*<\/div>/g, '');
+}
+
+// removes cases of multiple anchor elements for the same hyperlink
+function removeDuplicateAnchors(htmlString) {
+  // Regex pattern to match two adjacent anchor tags with the same href
+  const anchorPattern = /<a\s+([^>]*href=["']([^"']*)["'][^>]*)>([^<]*)<\/a>\s*<a\s+([^>]*href=["']\2["'][^>]*)>([^<]*)<\/a>/g;
+  
+  // Replace the matching adjacent anchor tags by merging their content into one
+  return htmlString.replace(anchorPattern, (match, firstAttrs, href, firstText, secondAttrs, secondText) => {
+    return `<a ${firstAttrs}>${firstText}${secondText}</a>`;
+  });
 }
 
 
