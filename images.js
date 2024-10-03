@@ -100,11 +100,12 @@ function convertImageToWebP(blob) {
                     resolve(webpBlob);
                 } else {
                     reject(new Error('Blob conversion failed'));
+                    alert("WebP image conversion failed. Please check your Google Doc for any broken images and try again. If you are still having issues, reach out to Jamie."); 
                 }
             }, 'image/webp', 0.8);
         };
         img.onerror = (error) => {
-            console.error("Image load error", error);
+            alert("WebP image conversion failed. Please check your Google Doc for any broken images and try again. If you are still having issues, reach out to Jamie."); 
             reject(new Error('Image load error'));
         };
         img.src = URL.createObjectURL(blob);
