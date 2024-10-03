@@ -61,11 +61,14 @@ function addAnchorsH2s(htmlString) {
   // Get all h2 elements
   const h2Elements = doc.querySelectorAll('h2');
 
+
   h2Elements.forEach(h2 => {
     // Get the text content inside the h2 element
     let anchorId = h2.textContent;
+
     // Save the original content for the TOC
     const originalContent = anchorId;
+
     // Convert anchorId to slug format
     anchorId = anchorId
       .replace(/<\/?[^>]+(>|$)/g, "")
@@ -74,6 +77,7 @@ function addAnchorsH2s(htmlString) {
       .replace(/--+/g, '-')
       .replace(/^-+|-+$/g, '')
       .toLowerCase();
+
 
     // Add to TOC items
     tocItems.push({ content: originalContent, id: anchorId });
@@ -92,12 +96,15 @@ function addAnchorsH2s(htmlString) {
 }
 
 function reorderTocItems(htmlString) {
-  // Create a map to store the index of each id in the htmlString
   const indexMap = {};
 
   tocItems.forEach(item => {
-    const index = htmlString.indexOf(item.id);
-    if (index !== -1) {
+    // Create a regular expression to find the anchor tags with the matching id and data-hs-anchor attribute
+    const anchorRegex = new RegExp(`<a[^>]*data-hs-anchor="true"[^>]*id="${item.id}"[^>]*>`, 'i');
+    const match = htmlString.match(anchorRegex); // Search for the anchor tag with the specific id
+    
+    if (match) {
+      const index = htmlString.indexOf(match[0]); // Get the position of the match in the htmlString
       indexMap[item.id] = index;
     }
   });
@@ -107,6 +114,7 @@ function reorderTocItems(htmlString) {
     return (indexMap[a.id] || Infinity) - (indexMap[b.id] || Infinity);
   });
 }
+
 
 function addTOC(htmlString) {
   const parser = new DOMParser();
@@ -140,5 +148,3 @@ function addTOC(htmlString) {
 
   return div.innerHTML;
 }
-
-
