@@ -36,6 +36,7 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = replaceEntities(htmlString);
     htmlString = removeBrTags(htmlString);
     htmlString = isolateImgs(htmlString);
+    htmlString = fixExtraImageText(htmlString);
     htmlString = createFeaturedSnippets(htmlString);
     if ($("#checkbox-3").is(":checked")) { htmlString = convertToSmartQuotes(htmlString); }
     htmlString = removeJunkAnchors(htmlString);
@@ -50,13 +51,61 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = removeTrailingWhitespace(htmlString);
     htmlString = removeEmptyDivs(htmlString);
     htmlString = removeDuplicateAnchors(htmlString);
-
     if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }
     if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }
 
-
     return htmlString;
 }
+
+// removes any extra text content that comes after an <img> element (that is nested inside a <p> element) and moves it to after the <p> element, in it's own p element. it also excludes any tags from this moved text
+function fixExtraImageText(htmlString) {
+    // Create a new DOM parser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, 'text/html');
+
+    // Get all <p> elements that contain an <img> tag
+    const pElements = Array.from(doc.querySelectorAll('p:has(img)'));
+
+    pElements.forEach(p => {
+        // Find the img tag within the <p> tag
+        const imgTag = p.querySelector('img');
+
+        // If there's no img tag, skip to the next <p>
+        if (!imgTag) return;
+
+        // Get the innerHTML of the <p> tag
+        const pInnerHTML = p.innerHTML;
+
+        // Find the position of the closing img tag
+        const imgTagHTML = imgTag.outerHTML;
+        const imgTagEndIndex = pInnerHTML.indexOf(imgTagHTML) + imgTagHTML.length;
+
+        // Extract the HTML after the img tag (if any)
+        const extraContent = pInnerHTML.slice(imgTagEndIndex).trim();
+
+        // If there is extra content, create a new <p> tag to insert the extra content
+        if (extraContent) {
+            // Strip out any HTML tags from the extra content
+            const strippedContent = extraContent.replace(/<[^>]*>/g, '').trim();
+
+            // Create a new <p> element for the stripped content
+            if (strippedContent) {
+                const newP = doc.createElement('p');
+                newP.textContent = strippedContent;
+
+                // Insert the new <p> tag right after the current <p> element
+                p.parentNode.insertBefore(newP, p.nextSibling);
+
+                // Remove the extra content from the original <p> element
+                p.innerHTML = pInnerHTML.slice(0, imgTagEndIndex);
+            }
+        }
+    });
+
+    // Serialize the document back to a string and return the updated HTML
+    return doc.body.innerHTML;
+}
+
 
 // removes any remaining class attributes from all tags and replaces them with style attributes
 function createTempStyleAttributes(htmlString) {
