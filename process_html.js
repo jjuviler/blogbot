@@ -24,40 +24,54 @@ function printCleanedHTML (htmlString) {
 
 function cleanHTML(htmlString, imgDetails) {
 
-    htmlString = createTempStyleAttributes(htmlString);
-    htmlString = convertStyleAttributes(htmlString);
-    htmlString = removeStyleAttributes(htmlString);
-    htmlString = keepBody(htmlString);
-    htmlString = removeSpanTags(htmlString);
-    htmlString = removePAttributes(htmlString);
-    htmlString = removeHeadingAttributes(htmlString);
-    htmlString = cleanAnchorHrefs(htmlString);
-    htmlString = cleanImgTags(htmlString);
-    htmlString = replaceEntities(htmlString);
-    htmlString = removeBrTags(htmlString);
-    htmlString = isolateImgs(htmlString);
-    htmlString = fixExtraImageText(htmlString);
-    htmlString = createFeaturedSnippets(htmlString);
-    if ($("#checkbox-3").is(":checked")) { htmlString = convertToSmartQuotes(htmlString); }
-    htmlString = removeJunkAnchors(htmlString);
-    if ($("#checkbox-6").is(":checked")) { htmlString = htmlString = removeImgName(htmlString); }
-    htmlString = removeEmptyLinks(htmlString);    
-    if ($("#checkbox-4").is(":checked")) { htmlString = formatImages(htmlString, imgDetails); }
-    if ($("#checkbox-2").is(":checked")) { htmlString = openLinksInNewTab(htmlString); }
-	htmlString = addAltText(htmlString);
-    if ($("#checkbox-5").is(":checked")) { htmlString = formatImageSource(htmlString); }
-    htmlString = convertHeadingLists(htmlString);
-    htmlString = removeEmptyTags(htmlString);
-    htmlString = removeTrailingWhitespace(htmlString);
-    htmlString = removeEmptyDivs(htmlString);
-    htmlString = removeDuplicateAnchors(htmlString);
-    if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }
-    if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }
+    // ===== convert from Google Docs HTML output to CMS-ready HTML =====
+    htmlString = createTempStyleAttributes(htmlString); // replace class attributes with style attributes in all tags
+    htmlString = keepBody(htmlString);                  // remove all parts of the HTML outside of the <body> tag, including the <body> and </body> tags
+    htmlString = removeJunkAnchors(htmlString);         // remove all anchors from tables that google adds for some reason
+
+
+    // ===== simplify the HTML string =====
+    htmlString = convertStyleAttributes(htmlString);    // convert style attributes to semantic tags
+    htmlString = removeStyleAttributes(htmlString);     // remove remaining style attributes
+    htmlString = removeSpanTags(htmlString);            // remove span tags
+    htmlString = removePAttributes(htmlString);         // remove attributes from p tags
+    htmlString = removeHeadingAttributes(htmlString);   // remove attributes from heading tags
+    htmlString = removeBrTags(htmlString);              // replace each br tag with the closing/opening tag of its parent element (except for br tags inside li tags)
+
+    // ===== implement SEO best practices =====
+    htmlString = cleanAnchorHrefs(htmlString);          // remove query strings from URLs
+    htmlString = replaceEntities(htmlString);           // replace all HTML entities (other than those for <, >, and &) with characters
+    if ($("#checkbox-2").is(":checked")) { htmlString = openLinksInNewTab(htmlString); }    // set all non-anchor links to open in a new tab (and add a rel=noopener attribute)
+
+    // ===== format image HTML =====
+    htmlString = cleanImgTags(htmlString);              // remove attributes from image tags except alt and src
+    if ($("#checkbox-4").is(":checked")) { htmlString = formatImages(htmlString, imgDetails); } // set all images to 650px wide and centered
+    htmlString = isolateImgs(htmlString);               // put each image in its own p element
+    htmlString = fixExtraImageText(htmlString);         // remove any extra text content that comes after an <img> element (that is nested inside a <p> element) and moves it to after the <p> element, in its own p element. It also excludes any tags from this moved text
+    if ($("#checkbox-6").is(":checked")) { htmlString = htmlString = removeImgName(htmlString); }   // remove instances of paragraphs that only contain "img name" or "image name"
+    // ^ examine this
+    htmlString = addAltText(htmlString);                // move alt text written under an image to the image's alt attribute
+    if ($("#checkbox-5").is(":checked")) { htmlString = formatImageSource(htmlString); }    // format the image source link below an image
+
+    // ===== featured snippets =====
+    htmlString = createFeaturedSnippets(htmlString);    // make featured snippets
+
+    // ===== implement style/content best practices ====
+    if ($("#checkbox-3").is(":checked")) { htmlString = convertToSmartQuotes(htmlString); } // convert straight quotes to smart quotes unless the straight quotes are in a snippet or CTA
+    htmlString = convertHeadingLists(htmlString);                                           // if headings are in a formatted list in the doc, take them out of that formatting
+    // if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }       // add a read more tag after the first paragraph that does not contain an img tag (disabled)
+    if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }   // add editor's note to the bottom of the post
+
+    // ===== additional cleanup =====
+    htmlString = removeDuplicateAnchors(htmlString);    // remove cases of multiple adjacent anchor elements in the same hyperlink
+    htmlString = extractAnchorTags(htmlString);         // remove cases of whitespace at the start/end of anchor tag content (e.g. <a href="#"> this is a link </a>)
+    htmlString = removeTrailingWhitespace(htmlString);  // remove unnecessary whitespace characters at the end of paragraph or heading
+    htmlString = removeEmptyTags(htmlString);           // remove empty p, sub, sup, strong, em, a, and heading tags
+    htmlString = removeEmptyDivs(htmlString);           // remove empty <div> tags
 
     return htmlString;
 }
 
-// removes any extra text content that comes after an <img> element (that is nested inside a <p> element) and moves it to after the <p> element, in it's own p element. it also excludes any tags from this moved text
 function fixExtraImageText(htmlString) {
     // Create a new DOM parser
     const parser = new DOMParser();
@@ -106,8 +120,6 @@ function fixExtraImageText(htmlString) {
     return doc.body.innerHTML;
 }
 
-
-// removes any remaining class attributes from all tags and replaces them with style attributes
 function createTempStyleAttributes(htmlString) {
     // Create a new DOM parser
     const parser = new DOMParser();
@@ -151,7 +163,6 @@ function createTempStyleAttributes(htmlString) {
     return serializer.serializeToString(doc);
 }
 
-// converts style attributes to semantic tags
 function convertStyleAttributes(htmlString) {
     // Create a new DOM parser
     const parser = new DOMParser();
@@ -193,7 +204,6 @@ function convertStyleAttributes(htmlString) {
     return serializer.serializeToString(doc);
 }
 
-// remove all remaining style attributes in the html string
 function removeStyleAttributes(htmlString) {
     // Create a new DOM parser
     var parser = new DOMParser();
@@ -216,7 +226,6 @@ function removeStyleAttributes(htmlString) {
 }
 
 
-// removes all parts of the HTML outside of the <body> tag, including the <body> and </body> tags
 function keepBody(htmlString) {
     // Use a regular expression to find content inside the <body> tags
     const bodyContentRegex = /<body[^>]*>((.|[\n\r])*)<\/body>/im;
@@ -224,35 +233,30 @@ function keepBody(htmlString) {
 
     // If there's a match, clean it up and return; otherwise, return an empty string
     if (match && match[1]) {
-        // Optionally, you could also strip leading and trailing whitespace
         return match[1].trim();
     }
     return "";
 }
 
-// removes all span tags
 function removeSpanTags(htmlString) {
     return htmlString.replace(/<span[^>]*>(.*?)<\/span>/gis, "$1");
 }
 
-// removes extra attributes from all p tags
 function removePAttributes(htmlString) {
     return htmlString.replace(/<p\s+[^>]*>/gi, '<p>');
 }
 
-// removes extra attributes from all heading tags (h1 through h6)
 function removeHeadingAttributes(htmlString) {
     return htmlString.replace(/<(h[1-6])\s+[^>]*>/gi, '<$1>');
 }
 
-// removes empty p, sub, sup, strong, em, and heading tags
 function removeEmptyTags(htmlString) {
     // Create a temporary element to hold the HTML content
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
 
     // Define the tags to clean
-    const tagsToClean = ['strong', 'em', 'sub', 'sup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
+    const tagsToClean = ['strong', 'em', 'sub', 'sup', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'];
 
     // Iterate over each tag type
     tagsToClean.forEach(tag => {
@@ -289,7 +293,6 @@ function cleanAnchorHrefs(htmlString) {
     });
 }
 
-// removes all attributes from image tags except alt and src
 function cleanImgTags(htmlString) {
     // Use a regular expression to find all <img> tags and modify their attributes
     return htmlString.replace(/<img\s+[^>]*>/gi, function(tag) {
@@ -309,7 +312,6 @@ function cleanImgTags(htmlString) {
     });
 }
 
-// replaces all HTMl entities (other than those for <, >, and &)
 function replaceEntities(htmlString) {
     htmlString = htmlString.replace(/&nbsp;|&#160;/g, ' '); 
     htmlString = htmlString.replace(/\u00A0/g, ' ');      
@@ -376,7 +378,6 @@ function removeBrTags(htmlString) {
 }
 
 
-// puts each image in its own p element
 function isolateImgs(htmlString) {
 
     // Function to wrap content in a specific tag
@@ -435,7 +436,6 @@ function isolateImgs(htmlString) {
     return htmlString;
 }
 
-// convert straight quotes to smart quotes unless the straight quotes are in a snippet or CTA
 function convertToSmartQuotes(htmlString) {
   // Create a regular expression to match straight quotes
   var straightQuotesRegex = /("([^"]|\\")*")|('([^']|\\')*')/g;
@@ -471,14 +471,11 @@ function convertToSmartQuotes(htmlString) {
   return segments.join('');
 }
 
-// remove all anchors for tables that google adds for some reason.
 function removeJunkAnchors(htmlString) {
-    // It uses a greedy approach to handle nested content correctly up to a simple depth
     const regex = /<a\s+[^>]*?\bid=['"][^'"]*['"][^>]*>[\s\S]*?<\/a>/gi;
     return htmlString.replace(regex, '');
 }
 
-// searches for instances of "img name" or "image name" (case-insensitive) and deletes the entire line if found
 function removeImgName(htmlString) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, 'text/html');
@@ -495,7 +492,6 @@ function removeImgName(htmlString) {
     return doc.body.innerHTML;
 }
 
-// removes empty <a> tags
 function removeEmptyLinks(htmlString) {
   // Regex to find <a> tags with only spaces, tabs, or HTML entities like &nbsp; as their content
   htmlString = htmlString.replace(/<a [^>]*?>\s*(&nbsp;)*\s*<\/a>/gi, ' ');
@@ -506,7 +502,6 @@ function removeEmptyLinks(htmlString) {
   return htmlString;
 }
 
-// set all images to 650px wide and centered
 function formatImages(htmlString, imgDetails) {
     // Iterate through each image detail object
     imgDetails.forEach(detail => {
@@ -523,14 +518,12 @@ function formatImages(htmlString, imgDetails) {
     return htmlString;
 }
 
-// sets all non-anchor links to open in a new tab (along with adding a rel=noopener attribute)
 function openLinksInNewTab(htmlString) {
   const pattern = /<a\s+(?:[^>]*?\s+)?href="((?:https?:\/\/)[^"]+)"/gi;
   const replacement = '<a href="$1" rel="noopener" target="_blank"';
   return htmlString.replace(pattern, replacement);
 }
 
-// checks if there is a read more tag in the post. if not, adds a read more tag after the first paragraph that does not contain an img tag
 function addReadMoreTag(htmlString) {
   // Check if "<!--more-->" is already present. if so, return original string
   if (htmlString.includes("<!--more-->")) { return htmlString; }
@@ -611,7 +604,6 @@ function addAltText(htmlString) {
     return paragraphs.join('</p>');
 }
 
-// Adds an editor's note to the bottom of the post
 function addEditorsNote(htmlString) {
   const month = $('#monthSelect').val();
   const year = $('#yearSelect').val();
@@ -622,7 +614,7 @@ function addEditorsNote(htmlString) {
   // Find and remove any paragraphs that contain "Editor's note"
   const paragraphs = Array.from(doc.querySelectorAll("p"));
   paragraphs.forEach(p => {
-    if (p.textContent.includes("Editor's note")) {
+    if (p.textContent.includes("Editor's note:")) {
       p.remove();
     }
   });
@@ -647,7 +639,6 @@ function addEditorsNote(htmlString) {
   return doc.body.innerHTML;
 }
 
-// if headings are in a formatted list in the doc, take them out of that formatting
 function convertHeadingLists(htmlString) {
     // Create a temporary element to parse the HTML string
     let tempElement = document.createElement('div');
@@ -682,7 +673,6 @@ function convertHeadingLists(htmlString) {
     return tempElement.innerHTML;
 }
 
-// formats the image source link below an image
 function formatImageSource(htmlString) {
     // Use DOMParser to parse the HTML string
     const parser = new DOMParser();
@@ -773,7 +763,6 @@ function formatImageSource(htmlString) {
     return doc.body.innerHTML;
 }
 
-// remove any unnecessary whitespace characters at the end of paragraph or heading content
 function removeTrailingWhitespace(htmlString) {
     // Regular expression to match <p> and <h1> to <h6> elements, ignoring content within tags
     htmlString = htmlString.replace(/(<p[^>]*>|<h[1-6][^>]*>)([\s\S]*?)(<\/p>|<\/h[1-6]>)/g, function(match, openingTag, content, closingTag) {
@@ -808,8 +797,8 @@ function removeTrailingWhitespace(htmlString) {
 }
 
 function removeEmptyDivs(htmlString) {
-    // Regular expression to find and remove exact empty <div></div> occurrences
-    return htmlString.replace(/<div>\s*<\/div>/g, '');
+    // find <div> elements that contain only whitespace, HTML tags, or both
+    return htmlString.replace(/<div>(\s|<[^>]+>)*<\/div>/g, '');
 }
 
 // removes cases of multiple anchor elements for the same hyperlink
@@ -902,11 +891,18 @@ function checkEllipses(htmlString) {
     return regex.test(htmlString);
 }
 
-// checks for "versus" in headings or "vs." in paragraphs
+// checks for "versus" in headings or "vs." in paragraphs (outside of any nested html tags)
 function checkVersusVs(htmlString) {
-	const regex = /<p[^>]*>(?:(?!<\/p>)[\s\S])*vs\.(?:(?!<\/p>)[\s\S])*<\/p>|<(h[2-6])[^>]*>(?:(?:(?!<\/\1>)[\s\S])*versus(?:(?!<\/\1>)[\s\S])*)<\/\1>/i;
-	return regex.test(htmlString);
+    // Modified regex to find "vs." in a paragraph, excluding cases where "vs." is inside HTML tags
+    const vsInParagraph = /<p[^>]*>(?:(?!<\/p>|<[^>]*>)[\s\S])*vs\.(?:(?!<\/p>|<[^>]*>)[\s\S])*<\/p>/i;
+
+    // Modified regex to find "versus" in headings <h2>...</h2> to <h6>...</h6>, excluding cases where "versus" is inside HTML tags
+    const versusInHeading = /<(h[2-6])[^>]*>(?:(?!<\/\1>|<[^>]*>)[\s\S])*versus(?:(?!<\/\1>|<[^>]*>)[\s\S])*<\/\1>/i;
+
+    // Return true if either regex matches the HTML string, otherwise return false
+    return vsInParagraph.test(htmlString) || versusInHeading.test(htmlString);
 }
+
 
 // check for instances of "?" in URLs (excluding youtube video links, which require a query string)
 function checkQueryStrings(htmlString) {
