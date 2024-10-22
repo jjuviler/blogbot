@@ -11,7 +11,6 @@ $(document).ready(function() {
     // Initially disable the drop area
     $('#drop-area').css('opacity', '0.3').find('input, label').prop('disabled', true);
 
-    // Function to check the text input and enable/disable the drop area
     $('#primaryKeyword').on('input', function() {
         var inputText = $(this).val().trim();
         if (inputText.length > 0) {
