@@ -60,7 +60,6 @@ function cleanHTML(htmlString, imgDetails) {
     if ($("#checkbox-3").is(":checked")) { htmlString = convertToSmartQuotes(htmlString); } // convert straight quotes to smart quotes unless the straight quotes are in a snippet or CTA
     htmlString = convertHeadingLists(htmlString);                                           // if headings are in a formatted list in the doc, take them out of that formatting
     // if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }       // add a read more tag after the first paragraph that does not contain an img tag (disabled)
-    if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }   // add editor's note to the bottom of the post
 
     // ===== additional cleanup =====
     htmlString = removeDuplicateAnchors(htmlString);    // remove cases of multiple adjacent anchor elements in the same hyperlink
@@ -68,6 +67,10 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = removeTrailingWhitespace(htmlString);  // remove unnecessary whitespace characters at the end of paragraph or heading
     htmlString = removeEmptyTags(htmlString);           // remove empty p, sub, sup, strong, em, a, and heading tags
     htmlString = removeEmptyDivs(htmlString);           // remove empty <div> tags
+
+    // ===== add editor's note =====
+    if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }   // add editor's note to the bottom of the post
+
 
     return htmlString;
 }
