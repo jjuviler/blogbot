@@ -61,16 +61,30 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = convertHeadingLists(htmlString);                                           // if headings are in a formatted list in the doc, take them out of that formatting
     // if ($("#checkbox-1").is(":checked")) { htmlString = addReadMoreTag(htmlString); }       // add a read more tag after the first paragraph that does not contain an img tag (disabled)
 
+
     // ===== additional cleanup =====
+   
     htmlString = removeDuplicateAnchors(htmlString);    // remove cases of multiple adjacent anchor elements in the same hyperlink
-    htmlString = extractAnchorTags(htmlString);         // remove cases of whitespace at the start/end of anchor tag content (e.g. <a href="#"> this is a link </a>)
-    htmlString = removeTrailingWhitespace(htmlString);  // remove unnecessary whitespace characters at the end of paragraph or heading
+    htmlString = removeEmptyAnchors(htmlString);        // remove cases of anchor elements containing only whitespace or no content at all
+    htmlString = extractAnchorTags(htmlString);         // remove cases of whitespace at the start/end of anchor tag content (e.g. <a href="#"> this is a link </a>)  
     htmlString = removeEmptyTags(htmlString);           // remove empty p, sub, sup, strong, em, a, and heading tags
     htmlString = removeEmptyDivs(htmlString);           // remove empty <div> tags
 
     // ===== add editor's note =====
     if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }   // add editor's note to the bottom of the post
 
+
+    return htmlString;
+}
+
+function removeEmptyAnchors(htmlString) {
+    // Step 1: Replace anchor tags with only whitespace between them with a single space
+    const whitespaceOnlyAnchorRegex = /<a\b[^>]*>\s+<\/a>/gi;
+    htmlString = htmlString.replace(whitespaceOnlyAnchorRegex, ' ');
+
+    // Step 2: Remove anchor tags with nothing between them
+    const emptyAnchorRegex = /<a\b[^>]*><\/a>/gi;
+    htmlString = htmlString.replace(emptyAnchorRegex, '');
 
     return htmlString;
 }
