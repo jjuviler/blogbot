@@ -1,5 +1,6 @@
 
 function extractAnchorTags(htmlString) {
+
     // Regular expression to match the opening <a> tag, its content, and the closing </a> tag
     const anchorRegex = /<a\s[^>]*>.*?<\/a>/gi;
 
@@ -181,5 +182,3 @@ function extractAnchorTags(htmlString) {
     // Return the final modified HTML string
     return htmlString;
 }
-
-
