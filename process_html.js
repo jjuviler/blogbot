@@ -67,6 +67,7 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = removeDuplicateAnchors(htmlString);    // remove cases of multiple adjacent anchor elements in the same hyperlink
     htmlString = removeEmptyAnchors(htmlString);        // remove cases of anchor elements containing only whitespace or no content at all
     htmlString = extractAnchorTags(htmlString);         // remove cases of whitespace at the start/end of anchor tag content (e.g. <a href="#"> this is a link </a>)  
+    htmlString = removeTrailingWhitespace(htmlString)   // remove cases of whitespace just before the end of a closing p or h1-h6 tag
     htmlString = removeEmptyTags(htmlString);           // remove empty p, sub, sup, strong, em, a, and heading tags
     htmlString = removeEmptyDivs(htmlString);           // remove empty <div> tags
 
@@ -781,36 +782,22 @@ function formatImageSource(htmlString) {
 }
 
 function removeTrailingWhitespace(htmlString) {
-    // Regular expression to match <p> and <h1> to <h6> elements, ignoring content within tags
-    htmlString = htmlString.replace(/(<p[^>]*>|<h[1-6][^>]*>)([\s\S]*?)(<\/p>|<\/h[1-6]>)/g, function(match, openingTag, content, closingTag) {
-        // Match all HTML tags inside the content and store their positions
+    return htmlString.replace(/(<p[^>]*>|<h[1-6][^>]*>)([\s\S]*?)(<\/p>|<\/h[1-6]>)/g, function(match, openingTag, content, closingTag) {
         const tagMatches = [...content.matchAll(/<[^>]*>/g)];
-        
-        // Remove all HTML tags from the content to analyze the text
         const strippedContent = content.replace(/<[^>]*>/g, '');
-        
-        // Find the index of the last non-whitespace character in the stripped content
         const lastNonWhitespaceIndex = strippedContent.search(/\S(?=\s*$)/);
 
         if (lastNonWhitespaceIndex !== -1) {
-            // Trim any extra whitespace from the content after the last non-whitespace character
             const cleanContent = strippedContent.slice(0, lastNonWhitespaceIndex + 1);
-
-            // Reinsert the HTML tags in their original positions
             let finalContent = cleanContent;
             tagMatches.forEach(match => {
                 const position = match.index;
                 finalContent = finalContent.slice(0, position) + match[0] + finalContent.slice(position);
             });
-
-            // Return the cleaned content with the opening and closing tags intact
             return openingTag + finalContent + closingTag;
         }
-
-        return match; // If no non-whitespace characters are found, return the match as-is
+        return match;
     });
-
-    return htmlString;
 }
 
 function removeEmptyDivs(htmlString) {
