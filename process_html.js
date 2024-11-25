@@ -717,7 +717,7 @@ function formatImageSource(htmlString) {
 
                     const anchor = nextSibling.querySelector('a');
 
-                    if (anchor && /image source/i.test(anchor.textContent)) {
+                    if (anchor && /(?:image source|source)/i.test(anchor.textContent)) {
                         hrefValue = anchor.getAttribute('href');
 
                         // Remove the paragraph element
@@ -768,7 +768,7 @@ function formatImageSource(htmlString) {
                 const emElement = document.createElement('em');
                 const newAnchor = document.createElement('a');
                 newAnchor.href = hrefValue;
-                newAnchor.textContent = 'Image Source';
+                newAnchor.textContent = 'Source';
 
                 emElement.appendChild(newAnchor);
                 newParagraph.appendChild(emElement);
@@ -988,4 +988,3 @@ function checkLinkWhitespace(htmlString) {
 
     return matchFound;
 }
-
