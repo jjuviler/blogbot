@@ -578,11 +578,13 @@ function addAltText(htmlString) {
     for (let i = 0; i < paragraphs.length; i++) {
         let altText = null;
 
+        // Preprocess the paragraph to remove HTML tags
+        const strippedParagraph = paragraphs[i].replace(/<[^>]*>/g, '').toLowerCase();
+
         for (const marker of altMarkers) {
-            const markerIndex = paragraphs[i].toLowerCase().indexOf(marker);
+            const markerIndex = strippedParagraph.indexOf(marker);
             if (markerIndex !== -1) {
-                altText = paragraphs[i].substring(markerIndex + marker.length).trim();
-                altText = altText.replace(/<[^>]+>/g, ''); // Strip out any HTML tags
+                altText = strippedParagraph.substring(markerIndex + marker.length).trim();
                 break;
             }
         }
