@@ -732,28 +732,36 @@ function formatImageSource(htmlString) {
                 nextSibling = nextSibling.nextElementSibling;
             }
 
-            // If no "image source" anchor tag was found, check for link strings
+            // If no "image source" anchor tag was found, check for link strings (excluding youtube ones)
             if (!found) {
                 nextSibling = imgParagraph.nextElementSibling;
                 for (let i = 0; i < 4 && nextSibling; i++) {
                     if (nextSibling.tagName.toLowerCase() === 'p') {
                         if (nextSibling.querySelector('img')) {
-                            // Stop if the paragraph contains an img element
+                            // Stop if the paragraph contains another image
                             break;
                         }
+
                         const textContent = nextSibling.textContent;
                         const linkStringMatch = textContent.match(/https?:\/\/[^\s"<]+/);
 
                         if (linkStringMatch) {
-                            hrefValue = linkStringMatch[0];
+                            const potentialHref = linkStringMatch[0];
+
+                            // Exclude links containing "https://youtu.be" or "https://www.youtube"
+                            if (potentialHref.includes('https://youtu.be') || potentialHref.includes('https://www.youtube')) {
+                                continue; // Skip this link and keep searching
+                            }
+
+                            hrefValue = potentialHref;
 
                             // Remove the paragraph element only if it contains only whitespace and the link
                             if (textContent.trim() === hrefValue) {
                                 nextSibling.remove();
                             } else {
-                                hrefValue = ''; // Invalidate the hrefValue if there are other characters
+                                hrefValue = ''; // Invalidate the hrefValue if other characters are present
                             }
-                            
+
                             break;
                         }
                     }
