@@ -779,6 +779,10 @@ function formatImageSource(htmlString) {
                 const newAnchor = document.createElement('a');
                 newAnchor.href = hrefValue;
                 newAnchor.textContent = 'Source';
+                
+                // Add rel and target attributes
+                newAnchor.setAttribute('rel', 'noopener');
+                newAnchor.setAttribute('target', '_blank');
 
                 emElement.appendChild(newAnchor);
                 newParagraph.appendChild(emElement);
