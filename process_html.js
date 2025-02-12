@@ -912,7 +912,7 @@ function checkEllipses(htmlString) {
 // checks for "versus" in headings or "vs." in paragraphs (outside of any nested html tags)
 function checkVersusVs(htmlString) {
     // Modified regex to find "vs." in a paragraph, excluding cases where "vs." is inside HTML tags
-    const vsInParagraph = /<p[^>]*>(?:(?!<\/p>|<[^>]*>)[\s\S])*vs\.(?:(?!<\/p>|<[^>]*>)[\s\S])*<\/p>/i;
+    const vsInParagraph = /<p[^>]*>(?:(?!<\/p>|<[^>]*>|\{[^}]*vs\.[^}]*\})[\s\S])*vs\.(?:(?!<\/p>|<[^>]*>|\{[^}]*vs\.[^}]*\})[\s\S])*<\/p>/gi;
 
     // Modified regex to find "versus" in headings <h2>...</h2> to <h6>...</h6>, excluding cases where "versus" is inside HTML tags
     const versusInHeading = /<(h[2-6])[^>]*>(?:(?!<\/\1>|<[^>]*>)[\s\S])*versus(?:(?!<\/\1>|<[^>]*>)[\s\S])*<\/\1>/i;
