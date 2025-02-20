@@ -52,20 +52,9 @@ function createFeaturedSnippets(htmlString) {
     return doc.body.innerHTML;
 }
 
-// Example implementations for the snippet creation functions
-function createFsListCode(items) {
-    const listItems = items.map(item => `<li>${item}</li>`).join('');
-    return `<ul>${listItems}</ul>`;
-}
-
-function createFsParagraphCode(items) {
-    return `<h2>${items[0]}</h2><p>${items[1]}</p>`;
-}
-
-
 // creates paragraph featured snippet code
 function createFsParagraphCode(items) {
-  return '<p>{{ sgMacro.render_ftSnippet({ header: "' + items[0] + '", content_type: "paragraph", list: { items : [ "" ] }, paragraph: { content: "' + items[1] + '" } }) }}</p>';
+  return '{% module "featured_snippet" path="/_Web Team Assets/Component Modules/modules/featuredSnippet", label="featuredSnippet", content_type="paragraph", paragraph="' + items[1] + '", header="' + items[0] + '", style={ "theme": "white", "paddingTop": "xs", "paddingBottom": "xs" } %}';
 }
 
 // creates list featured snippet code
@@ -76,8 +65,7 @@ function createFsListCode(items) {
     if (i != items.length - 1) { itemsStr += ', '; }
   }
 
-  return '<p>{{ sgMacro.render_ftSnippet({ header: "' + items[0] + '", content_type: "ordered_list", list: { items : [ ' + itemsStr + ' ] }, paragraph: { content: "" } }) }}</p>';
+  return '{% module "featured_snippet" path="/_Web Team Assets/Component Modules/modules/featuredSnippet", label="featuredSnippet", listItems=[ ' + itemsStr + ' ], content_type="ordered_list", header="' + items[0] + '", style={ "theme": "white", "paddingTop": "xs", "paddingBottom": "xs" } %}';
 }
-
 
 
