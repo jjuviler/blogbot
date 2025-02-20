@@ -865,8 +865,9 @@ function checkHTML(htmlString) {
         issueMessages.push('Remove H5s and H6s from the body of the post if possible.');
         isIssue = true;
     }
-    if (checkHeadingHierarchy(htmlString)) {
-        issueMessages.push('Headings may be out of order. Check to make sure that h3s only follow h2s or h3, etc.');
+    const headingIssue = checkHeadingHierarchy(htmlString);
+    if (headingIssue) {
+        issueMessages.push(`Headings may be out of order. Issue found at: ${headingIssue}`);
         isIssue = true;
     }
     if (checkLinkWhitespace(htmlString)) {
@@ -952,36 +953,33 @@ function checkH5sH6s(htmlString) {
 
 // checks that heading tags are in the correct order (h3s only follow h2s or h3s, etc.)
 function checkHeadingHierarchy(htmlString) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, "text/html");
+    const parser = new DOMParser();
 
-  // Convert paragraphs with 'ftsnippet' to h2 elements
-  const paragraphs = doc.querySelectorAll("p");
-  paragraphs.forEach(p => {
-    if (p.textContent.toLowerCase().includes("ftsnippet")) {
-      const newH2 = doc.createElement("h2");
-      newH2.innerHTML = p.innerHTML; // Preserve the content of the paragraph
-      p.replaceWith(newH2);
+    // Wrap {% ... %} in <h2> tags to ensure proper heading hierarchy
+    htmlString = htmlString.replace(/({%\s*.*?\s*%})/g, '<h2>$1</h2>');
+
+    const doc = parser.parseFromString(htmlString, "text/html");
+
+    const headings = doc.querySelectorAll("h2, h3, h4");
+
+    if (headings.length === 0) return false; // No headings, assume no issue
+
+    // Ensure the first heading is an h2
+    if (headings[0].tagName.toLowerCase() !== 'h2') {
+        return headings[0].textContent.trim(); // Return only the heading text
     }
-  });
 
-  const headings = doc.querySelectorAll("h2, h3, h4");
+    let prevHeadingLevel = 2; // Start from h2
+    for (let heading of headings) {
+        const currHeadingLevel = parseInt(heading.tagName.substring(1));
 
-  if (headings.length === 0) return false;  // Assuming no headings is considered not okay
-
-  // Return false if the first heading is not an h2
-  if (headings[0].tagName.toLowerCase() !== 'h2') return true;
-
-  let prevHeadingLevel = 2;  // Start from h2
-  for (let heading of headings) {
-    const currHeadingLevel = parseInt(heading.tagName.substring(1));
-    if (currHeadingLevel > prevHeadingLevel + 1) {
-      return true; // No skips in the sequence allowed
+        if (currHeadingLevel > prevHeadingLevel + 1) {
+            return heading.textContent.trim(); // Return only the heading text
+        }
+        prevHeadingLevel = currHeadingLevel;
     }
-    prevHeadingLevel = currHeadingLevel;
-  }
 
-  return false; // All checks pass, return true as hierarchy is correct
+    return false; // No issues found
 }
 
 // check for whitespace character on either side of link text
