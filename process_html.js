@@ -69,6 +69,7 @@ function cleanHTML(htmlString, imgDetails) {
     htmlString = extractAnchorTags(htmlString);         // remove cases of whitespace at the start/end of anchor tag content (e.g. <a href="#"> this is a link </a>)  
     htmlString = removeTrailingWhitespace(htmlString)   // remove cases of whitespace just before the end of a closing p or h1-h6 tag
     htmlString = removeEmptyTags(htmlString);           // remove empty p, sub, sup, strong, em, a, and heading tags
+    htmlString = putEmInAnchors(htmlString);            // place any em tags directly outside of an anchor tag inside the anchor tag
     htmlString = removeEmptyDivs(htmlString);           // remove empty <div> tags
 
     // ===== add editor's note =====
@@ -1000,3 +1001,15 @@ function checkLinkWhitespace(htmlString) {
 
     return matchFound;
 }
+
+// find instances of em tags directly outside of anchor tags, and move them inside the anchor tags
+function putEmInAnchors(htmlString) {
+    return htmlString.replace(/<em>(\s*<(?:\w+\s*)*a\b[^>]*>.*?<\/a>\s*)<\/em>/gi, (match, anchorContent) => {
+        return anchorContent.replace(/<a\b([^>]*)>(.*?)<\/a>/i, '<a$1><em>$2</em></a>');
+    });
+}
+
+
+
+
+
