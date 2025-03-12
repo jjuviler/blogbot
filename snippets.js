@@ -41,6 +41,9 @@ function createFeaturedSnippets(htmlString) {
                 }
                 newHtml = createFsParagraphCode(items);
             }
+            
+            // Wrap newHtml in <p> tags
+            newHtml = `<p>${newHtml}</p>`;
 
             // Replace the h2 element directly with new HTML content
             const range = document.createRange();
@@ -67,5 +70,3 @@ function createFsListCode(items) {
 
   return '{% module "featured_snippet" path="/_Web Team Assets/Component Modules/modules/featuredSnippet", label="featuredSnippet", listItems=[ ' + itemsStr + ' ], content_type="ordered_list", header="' + items[0] + '", style={ "theme": "white", "paddingTop": "xs", "paddingBottom": "xs" } %}';
 }
-
-
