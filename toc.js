@@ -18,10 +18,11 @@ function addAnchorsFeaturedSnippets(htmlString) {
   const paragraphs = doc.querySelectorAll('p');
 
   paragraphs.forEach(paragraph => {
-    // Check if the paragraph contains "ftsnippet" (case insensitive)
-    if (paragraph.textContent.toLowerCase().includes('ftsnippet')) {
+    // Check if the paragraph contains "ftsnippet" or "featuredSnippet" (case insensitive)
+    const paragraphText = paragraph.textContent.toLowerCase();
+    if (paragraphText.includes('ftsnippet') || paragraphText.includes('featured_snippet')) {
       // Extract the anchorId from the paragraph
-      const headerMatch = paragraph.outerHTML.match(/header:\s*"(.*?)"/i);
+      const headerMatch = paragraph.outerHTML.match(/header[:=]\s*"(.*?)"/i);
       if (headerMatch) {
         let anchorId = headerMatch[1];
         // Save the original content for the TOC
