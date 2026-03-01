@@ -1,0 +1,21 @@
+{
+  "name": "aeo-checker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo \"no build\""
+  },
+  "engines": { "node": "22.x" },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^5.1.0",
+    "he": "^1.2.0"
+  }
+}

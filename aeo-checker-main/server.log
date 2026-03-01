@@ -1,0 +1,3 @@
+[Server Debug] Server starting up...
+AEO checker server running at http://localhost:3000
+Provider: OpenAI — Model: gpt-4o-mini — Base: https://api.openai.com
