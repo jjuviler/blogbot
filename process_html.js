@@ -75,6 +75,8 @@ function cleanHTML(htmlString, imgDetails) {
     // ===== add editor's note =====
     if ($('#addEditorsNote').is(':checked')) { htmlString = addEditorsNote(htmlString); }   // add editor's note to the bottom of the post
 
+    // ===== convert tables to HubL modules =====
+    htmlString = convertTablesToHubLModules(htmlString);
 
     return htmlString;
 }
